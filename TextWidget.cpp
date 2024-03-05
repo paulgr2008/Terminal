@@ -31,10 +31,10 @@ void TextWidget::createWidgets(){
 
 void TextWidget::createConnections(){
 
-    connect(&m_findTextLineEdit, &QLineEdit::textChanged, this, TextWidget::highlightText,     Qt::DirectConnection);
-    connect(&m_textEdit,         &QTextEdit::textChanged, this, TextWidget::highlightText,     Qt::DirectConnection);
-    connect(&m_nextButton,       &QPushButton::clicked,   this, TextWidget::goToNextHighlight, Qt::DirectConnection);
-    connect(&m_previousButton,   &QPushButton::clicked,   this, TextWidget::goToPrevHighlight, Qt::DirectConnection);
+    connect(&m_findTextLineEdit, &QLineEdit::textChanged, this, &TextWidget::highlightText,     Qt::DirectConnection);
+    connect(&m_textEdit,         &QTextEdit::textChanged, this, &TextWidget::highlightText,     Qt::DirectConnection);
+    connect(&m_nextButton,       &QPushButton::clicked,   this, &TextWidget::goToNextHighlight, Qt::DirectConnection);
+    connect(&m_previousButton,   &QPushButton::clicked,   this, &TextWidget::goToPrevHighlight, Qt::DirectConnection);
 
 }
 

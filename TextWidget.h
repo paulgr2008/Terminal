@@ -7,7 +7,7 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QKeyEvent>
-#include "Highlighter.h"
+#include "highlighter.h"
 
 class TextWidget : public QWidget{
 
