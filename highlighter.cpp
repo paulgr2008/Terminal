@@ -5,7 +5,7 @@
 Highlighter::Highlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
-    m_defaultHighlightingRule.format.setBackground(Qt::yellow);
+    m_defaultHighlightingRule.format.setBackground(Qt::white);
     m_defaultHighlightingRule.format.setFontWeight(QFont::Bold);
 
     m_activeHighlightingRule.format.setBackground(QColor(255, 165, 0));
@@ -53,20 +53,31 @@ void Highlighter::customRehighlight(){
 
 int Highlighter::setNextMatchStateActive(){
     int startIndex = -1;
+    if(!m_matchList.size())
+        return -1;
     if(m_activeMatchIndex + 1 < m_matchList.size()){
         ++m_activeMatchIndex;
-        customRehighlight();
-        startIndex = m_matchList[m_activeMatchIndex].capturedEnd() + m_activeBlock.position();
     }
+    else
+        m_activeMatchIndex = 0;
+    customRehighlight();
+    startIndex = m_matchList[m_activeMatchIndex].capturedEnd() + m_activeBlock.position();
+
+
     return startIndex;
 }
 
 int Highlighter::setPrevMatchStateActive(){
     int startIndex = -1;
-    if(m_activeMatchIndex - 1 >= 0){
+    if(!m_matchList.size())
+        return -1;
+    if(m_activeMatchIndex - 1 >= 0)
         --m_activeMatchIndex;
-        customRehighlight();
-        startIndex = m_matchList[m_activeMatchIndex].capturedEnd() + m_activeBlock.position();
-    }
+    else
+        m_activeMatchIndex = m_matchList.size()-1;
+
+    customRehighlight();
+    startIndex = m_matchList[m_activeMatchIndex].capturedEnd() + m_activeBlock.position();
+
     return startIndex;
 }

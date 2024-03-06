@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "TextWidget.h"
+#include "consoledialog.h"
 
 class MainWindow : public QMainWindow
 {
@@ -13,7 +13,7 @@ public:
     ~MainWindow();
 
 protected:
-    TextWidget m_textWidget;
+    ConsoleDialog m_consoleDialog;
 
 };
 #endif // MAINWINDOW_H

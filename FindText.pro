@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     TextWidget.cpp \
+    consoledialog.cpp \
     highlighter.cpp \
     main.cpp \
     MainWindow.cpp
@@ -17,9 +18,13 @@ SOURCES += \
 HEADERS += \
     MainWindow.h \
     TextWidget.h \
+    consoledialog.h \
     highlighter.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+FORMS += \
+    consoledialog.ui

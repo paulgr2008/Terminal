@@ -3,8 +3,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    resize(500, 500);
-    setCentralWidget(&m_textWidget);
+    resize(640, 480);
+    setCentralWidget(&m_consoleDialog);
 }
 
 MainWindow::~MainWindow()
