@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include "terminaldialog.h"
-
+class QFont;
 class DemoDialog : public QMainWindow {
         Q_OBJECT
 
@@ -11,7 +11,8 @@ class DemoDialog : public QMainWindow {
         DemoDialog(QWidget* parent = nullptr);
         ~DemoDialog();
         void printDataFromConsole(const QString& data);
-
+public slots:
+        void terminalFontChanged(QFont);
     protected:
         TerminalDialog* m_terminalDialog;
 

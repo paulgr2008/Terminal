@@ -8,25 +8,32 @@
 #include "colorizer.h"
 #include "treemodelcompleter.h"
 
+
+/* TODO:
+ * 1. Terminal mode: dev info, reboot and disconnect messages to a title???
+*/
+
 TerminalDialog::TerminalDialog(QWidget* parent) :
     QDialog(parent),
     ui(new Ui::TerminalDialog)
 {
     ui->setupUi(this);
-    createConnections();
+
     m_textHighlighter.setDocument(ui->consoleEditor->document());
     QFont deffont("Cascadia Mono", 11);
-    setConsoleFont(deffont);
+    setTerminalFont(deffont);
     QPalette p = palette();
     p.setColor(QPalette::Base, Qt::black);
     p.setColor(QPalette::Text, Qt::green);
     p.setColor(QPalette::Highlight, Qt::gray);
     p.setColor(QPalette::HighlightedText, Qt::white);
     ui->consoleEditor->setPalette(p);
-
+    ui->commandEditor->setPalette(p);
+    commandEdit = ui->commandEditor;
     completer = new TreeModelCompleter(this);
     toggleFindEditor(false);
     toggleFontEditor(false);
+    createConnections();
 }
 
 TerminalDialog::~TerminalDialog()
@@ -49,31 +56,31 @@ void TerminalDialog::toggleFontEditor(bool isChecked)
 void TerminalDialog::createConnections()
 {
     connect(ui->searchEditor, &QLineEdit::textChanged, this, &TerminalDialog::highlightText, Qt::DirectConnection);
-    connect(ui->nextButton, &QPushButton::clicked, this, &TerminalDialog::goToNextHighlight, Qt::DirectConnection);
-    connect(ui->prevButton, &QPushButton::clicked, this, &TerminalDialog::goToPrevHighlight, Qt::DirectConnection);
+    connect(ui->nextButton, &QToolButton::clicked, this, &TerminalDialog::goToNextHighlight, Qt::DirectConnection);
+    connect(ui->prevButton, &QToolButton::clicked, this, &TerminalDialog::goToPrevHighlight, Qt::DirectConnection);
     connect(ui->autocomplChBox, &QCheckBox::clicked,
             this, &TerminalDialog::manageAutocompleter);
-    connect(ui->fullScreenButton, &QPushButton::clicked,
+    connect(ui->fullScreenButton, &QToolButton::clicked,
             this, &TerminalDialog::consoleBtnManager);
-    connect(ui->cleanButton, &QPushButton::clicked,
+    connect(ui->cleanButton, &QToolButton::clicked,
             this, &TerminalDialog::cleanConsole);
 
-    connect(ui->changeFontButton, &QPushButton::clicked,
+    connect(ui->changeFontButton, &QToolButton::clicked,
             this, &TerminalDialog::fontButtonClicked);
-    connect(ui->increaseFontSzBtn, &QPushButton::clicked,
+    connect(ui->increaseFontSzBtn, &QToolButton::clicked,
             this, &TerminalDialog::fontButtonClicked);
-    connect(ui->decreaseFontSzBtn, &QPushButton::clicked,
+    connect(ui->decreaseFontSzBtn, &QToolButton::clicked,
             this, &TerminalDialog::fontButtonClicked);
-    connect(ui->commandEditor, &QLineEdit::returnPressed, this, &TerminalDialog::finishCommandEditing);
+    connect(commandEdit, &LineEdit::lineExecuted, this, &TerminalDialog::finishCommandEditing);
     connect(ui->findToolButton, &QToolButton::clicked, this, &TerminalDialog::toggleFindEditor);
     connect(ui->fontToolButton, &QToolButton::clicked, this, &TerminalDialog::toggleFontEditor);
 
 }
 
 
-void TerminalDialog::finishCommandEditing()
+void TerminalDialog::finishCommandEditing(QString data)
 {
-    emit dataFromConsole(ui->commandEditor->text());
+    emit dataFromConsole(data);
 }
 
 void TerminalDialog::cleanConsole()
@@ -105,7 +112,7 @@ void TerminalDialog::consoleBtnManager()
 
 void TerminalDialog::manageAutocompleter(bool state)
 {
-    ui->commandEditor->setCompleter((state) ? completer : nullptr);
+    commandEdit->setCompleter((state) ? completer : nullptr);
 }
 
 void TerminalDialog::closeHotKeySignalManager()
@@ -118,7 +125,7 @@ void TerminalDialog::fontButtonClicked()
     QToolButton* button = static_cast<QToolButton*>(this->sender());
 
     if (button == ui->changeFontButton)
-        setConsoleFont(QFontDialog::getFont(0, ui->consoleEditor->font(), NULL, QString(),
+        setTerminalFont(QFontDialog::getFont(0, ui->consoleEditor->font(), NULL, QString(),
                                             QFontDialog::MonospacedFonts));
     else if (button == ui->decreaseFontSzBtn) {
         changeFontSize(Qt::Key_Minus);
@@ -128,9 +135,10 @@ void TerminalDialog::fontButtonClicked()
     }
 }
 
-void TerminalDialog::setConsoleFont(QFont font)
+void TerminalDialog::setTerminalFont(QFont font)
 {
     ui->consoleEditor->document()->setDefaultFont(font);
+    ui->commandEditor->setFont(font);
 }
 
 
@@ -160,7 +168,8 @@ void TerminalDialog::changeFontSize(int hotKey)
         font.setPointSize(fontSize);
     }
 
-    ui->consoleEditor->document()->setDefaultFont(font);
+    setTerminalFont(font);
+    emit fontChanged(font);
 }
 
 void TerminalDialog::initColorizer(QMap<QString, QColor> colorMap)
@@ -173,13 +182,42 @@ void TerminalDialog::initCompleter(const QString& modelFileName)
 {
     QPointer<CompleterLoader> loader = new CompleterLoader(modelFileName);
     completer = loader->completer;
-    ui->commandEditor->setCompleter(completer);
+    commandEdit->setCompleter(completer);
 
+}
+
+void TerminalDialog::setHistory(const QStringList &history)
+{
+    commandEdit->setHistory(history);
+}
+
+const QStringList &TerminalDialog::history()
+{
+    return commandEdit->history() ;
+}
+
+void TerminalDialog::keyPressEvent(QKeyEvent *e)
+{
+    if(e->modifiers().testFlag(Qt::ControlModifier))
+    {
+        switch( e->key() )
+        {
+            case Qt::Key_Plus:
+            case Qt::Key_Minus:
+                changeFontSize( e->key());
+                break;
+
+        }
+    }
 }
 
 void TerminalDialog::dataToConsole(const QString& data)
 {
     ui->consoleEditor->insertPlainText(data);
+    QTextCursor cursor = ui->consoleEditor->textCursor();
+    cursor.movePosition(QTextCursor::End);
+    ui->consoleEditor->setTextCursor(cursor);
+
 }
 
 

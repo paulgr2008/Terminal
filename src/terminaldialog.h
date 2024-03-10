@@ -3,7 +3,9 @@
 
 #include <QDialog>
 #include "highlighter.h"
+#include "lineedit.h"
 
+class QFont;
 class Colorizer;
 class TreeModelCompleter;
 class QAbstractItemModel;
@@ -18,19 +20,25 @@ class TerminalDialog : public QDialog {
     public:
         explicit TerminalDialog(QWidget* parent = nullptr);
         ~TerminalDialog();
-        void setConsoleFont(QFont font);
+        void setTerminalFont(QFont font);
         void changeFontSize(int hotKey);
         void initColorizer(QMap<QString, QColor> colorMap);
         void initCompleter(const QString& modelFileName);
+        void setHistory(const QStringList& history);
+        const QStringList& history();
+        void keyPressEvent( QKeyEvent *e );
+
+
     public slots:
         void dataToConsole(const QString& data);
     signals:
         void dataFromConsole(const QString& data);
+        void fontChanged(QFont);
     protected:
         void createConnections();
         //void toggleFindWidget(bool visible);
     protected slots:
-        void finishCommandEditing();
+        void finishCommandEditing(QString data);
 
         //void keyPressEvent(QKeyEvent* event) override;
         void highlightText();
@@ -52,6 +60,7 @@ class TerminalDialog : public QDialog {
         Colorizer* colorizer;
         bool autocompleteOn;
         TreeModelCompleter* completer = nullptr;
+        LineEdit* commandEdit;
 
         QAbstractItemModel* completerModelFromFile(const QString& modelFileName);
 
