@@ -9,6 +9,7 @@ class QFont;
 class Colorizer;
 class TreeModelCompleter;
 class QAbstractItemModel;
+class QToolButton;
 
 namespace Ui {
     class TerminalDialog;
@@ -27,12 +28,12 @@ class TerminalDialog : public QDialog {
         void setHistory(const QStringList& history);
         const QStringList& history();
         void keyPressEvent( QKeyEvent *e );
-
+        QToolButton* expandButton();
 
     public slots:
-        void dataToConsole(const QString& data);
+        void dataToTerminal(const QString& data);
     signals:
-        void dataFromConsole(const QString& data);
+        void dataFromTerminal(const QString& data);
         void fontChanged(QFont);
     protected:
         void createConnections();
@@ -61,6 +62,8 @@ class TerminalDialog : public QDialog {
         bool autocompleteOn;
         TreeModelCompleter* completer = nullptr;
         LineEdit* commandEdit;
+
+
 
         QAbstractItemModel* completerModelFromFile(const QString& modelFileName);
 

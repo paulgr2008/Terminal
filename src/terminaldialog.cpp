@@ -80,7 +80,7 @@ void TerminalDialog::createConnections()
 
 void TerminalDialog::finishCommandEditing(QString data)
 {
-    emit dataFromConsole(data);
+    emit dataFromTerminal(data);
 }
 
 void TerminalDialog::cleanConsole()
@@ -211,7 +211,12 @@ void TerminalDialog::keyPressEvent(QKeyEvent *e)
     }
 }
 
-void TerminalDialog::dataToConsole(const QString& data)
+QToolButton *TerminalDialog::expandButton()
+{
+    return ui->fullScreenButton;
+}
+
+void TerminalDialog::dataToTerminal(const QString& data)
 {
     ui->consoleEditor->insertPlainText(data);
     QTextCursor cursor = ui->consoleEditor->textCursor();
